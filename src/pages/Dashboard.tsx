@@ -14,6 +14,8 @@ import {
   CheckCircle2,
   CreditCard
 } from 'lucide-react';
+import { db } from '../lib/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 // import { useUserCredits } from '../hooks/useUserCredits';
 
 
@@ -23,6 +25,7 @@ export default function Dashboard() {
   const [searchParams] = useSearchParams();
   const paymentStatus = searchParams.get('payment');
   const [credits, setCredits] = useState<number>(0);
+  const [projects, setProjects] = useState<any[]>([]); // State for user projects
   // const { credits, loading } = useUserCredits();
 
 
@@ -33,6 +36,8 @@ export default function Dashboard() {
         setCredits(userCredits);
       };
       loadCredits();
+      loadProjects();
+
 
       // Refresh credits every 30 seconds
       const interval = setInterval(loadCredits, 30000);
@@ -61,6 +66,29 @@ export default function Dashboard() {
       console.error('Error loading credits:', error);
     }
   };
+  const loadProjects = async () => {
+    if (!user) return;
+    try {
+      const projectsQuery = query(
+        collection(db, 'projects'),
+        where('userId', '==', user.uid)
+      );
+      const querySnapshot = await getDocs(projectsQuery);
+      const userProjects = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setProjects(userProjects);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      loadProjects();
+    }
+  }, [user]);
 
   // const handleLogout = async () => {
   //   try {
@@ -184,23 +212,46 @@ export default function Dashboard() {
             </button>
           </div>
 
-          {/* Empty State */}
-          <div className="text-center py-12">
-            <PenTool className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No projects yet</h3>
-            <p className="mt-1 text-sm text-gray-500">
-              Get started by creating a new content project
-            </p>
-            <div className="mt-6">
-              <button
-                onClick={() => navigate('/create')}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                New Project
-              </button>
+          {/* Project Cards */}
+          {projects.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {projects.map((project) => (
+                <div
+                  key={project.id}
+                  className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200"
+                  onClick={() => navigate(`/project/${project.id}`)} // Navigate to the details page
+               >
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {project.topic || 'Untitled'}
+                  </h3>
+                  <p className="text-sm text-gray-500">{project.content.substring(0, 100)}...</p>
+                  <button
+                    // onClick={() => navigate(`/project/${project.id}`)}
+                    className="mt-4 text-indigo-600 hover:text-indigo-800"
+                  >
+                    View Details
+                  </button>
+                </div>
+              ))}
             </div>
-          </div>
+          ) : (
+            <div className="text-center py-12">
+              <PenTool className="mx-auto h-12 w-12 text-gray-400" />
+              <h3 className="mt-2 text-sm font-medium text-gray-900">No projects yet</h3>
+              <p className="mt-1 text-sm text-gray-500">
+                Get started by creating a new content project
+              </p>
+              <div className="mt-6">
+                <button
+                  onClick={() => navigate('/create')}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Project
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </div>
