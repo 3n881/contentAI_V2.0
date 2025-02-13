@@ -236,7 +236,7 @@ export async function processPayment(userId: string, planId: string): Promise<vo
         await updateUserCreditsAfterPayment(userId, planId);
         // Just redirect to success page
         // The webhook will handle the actual payment verification and credit update
-        window.location.href = '/dashboard?payment=success';
+        window.location.href = 'https://contentai-v2-0.onrender.com/dashboard?payment=success';
       },
       modal: {
         ondismiss: function() {
@@ -259,7 +259,7 @@ export async function processPayment(userId: string, planId: string): Promise<vo
         error: response.error.description,
         updatedAt: new Date()
       });
-      window.location.href = '/dashboard?payment=failed';
+      window.location.href = 'https://contentai-v2-0.onrender.com/dashboard?payment=failed';
     });
 
     rzp.open();
