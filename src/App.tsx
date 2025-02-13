@@ -12,6 +12,8 @@ import SEOTools from './pages/SEOTools';
 import Scheduler from './pages/Scheduler';
 import GrammarChecker from './pages/GrammarChecker';
 import Pricing from './pages/Pricing';
+import ProjectDetails from './pages/ProjectDetails';
+
 
 function App() {
   return (
@@ -70,6 +72,7 @@ function App() {
                 </AuthGuard>
               } 
             />
+             <Route path="/project/:id" element={<AuthGuard><ProjectDetails /></AuthGuard>} /> {/* Add this */}
           </Routes>
         </Layout>
     </Router>
