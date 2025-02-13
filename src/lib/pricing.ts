@@ -23,7 +23,7 @@ export const pricingPlans: PricingPlan[] = [
   {
     id: 'starter',
     name: 'Starter',
-    price: 199,
+    price: 1,
     features: [
       '10 AI content generations',
       'Basic SEO optimization',
@@ -48,7 +48,7 @@ export const pricingPlans: PricingPlan[] = [
   {
     id: 'enterprise',
     name: 'Enterprise',
-    price: 1999,
+    price: 999,
     features: [
       'Unlimited AI content generations',
       'Premium SEO tools',
